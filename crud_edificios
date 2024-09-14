@@ -1,0 +1,48 @@
+-- edificios
+
+CREATE OR REPLACE FUNCTION DEPTOS.genera_id_edificios
+RETURN NUMBER 
+IS
+   id_r NUMBER;
+BEGIN
+  begin 
+    SELECT DECODE(max(t.ID_edif)+1,NULL,1,max(t.ID_edif)+1) into id_r
+    FROM T_edificios t;
+    EXCEPTION WHEN NO_DATA_FOUND THEN id_r:=0;
+  end;
+  return id_r;
+END;
+
+CREATE OR REPLACE PROCEDURE DEPTOS.inserta_edificios(
+  edificio IN VARCHAR2,
+  direccion IN VARCHAR2
+) IS
+  id number;
+BEGIN
+  select genera_id_edificios into id from dual;
+  INSERT INTO T_EDIFICIOS(ID_EDIF, EDIFICIO, DIRECCION)
+  values(id,edificio,direccion);
+END inserta_edificios;
+
+CREATE OR REPLACE PROCEDURE DEPTOS.elimina_edificios(id number) IS
+BEGIN
+   DELETE FROM T_EDIFICIOS te WHERE TE.ID_EDIF=ID;
+END;
+
+CREATE OR REPLACE PROCEDURE DEPTOS.actualiza_edificios(
+  id IN NUMBER, 
+  edif IN VARCHAR2,
+  direcc IN VARCHAR2
+) IS
+BEGIN
+  UPDATE T_EDIFICIOS TE
+  SET TE.EDIFICIO = edif
+  , TE.DIRECCION = direcc
+  WHERE TE.ID_EDIF=id;
+  COMMIT;
+END;
+
+CREATE OR REPLACE FORCE VIEW "DEPTOS"."VISTA_EDIFICIOS" AS 
+  SELECT te.ID_EDIF , te.EDIFICIO , te.DIRECCION 
+  FROM T_EDIFICIOS te 
+  ORDER BY te.EDIFICIO;
