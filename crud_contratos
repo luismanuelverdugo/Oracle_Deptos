@@ -1,0 +1,82 @@
+-- Contratos
+
+CREATE OR REPLACE FUNCTION DEPTOS.genera_id_contratos
+RETURN NUMBER 
+IS
+   id_r NUMBER;
+BEGIN
+  begin 
+    SELECT DECODE(max(t.ID_contra)+1,NULL,1,max(t.ID_contra)+1) into id_r
+    FROM T_contratos t;
+    EXCEPTION WHEN NO_DATA_FOUND THEN id_r:=0;
+  end;
+  return id_r;
+END;
+
+CREATE OR REPLACE PROCEDURE DEPTOS.inserta_contratos(
+  num IN VARCHAR2,
+  tip IN VARCHAR2,
+  rent IN NUMBER,
+  dia IN VARCHAR2,
+  sta IN VARCHAR2,
+  vigi IN DATE,
+  vigf IN DATE,
+  inqui IN NUMBER,
+  depto IN NUMBER 
+) IS
+  id NUMBER;
+BEGIN
+  begin	
+	  SELECT valida_deptos(depto) INTO id FROM dual;
+	  IF id<>0 THEN
+	    SELECT valida_inquilinos(inqui) INTO id FROM dual;
+	    IF id<>0 then 
+          select genera_id_contratos into id from dual;
+          INSERT INTO T_CONTRATOS(id_contra, numero, tipop, 
+          renta, diap, estatus, vigenciai, vigenciaf, id_depto, id_inqui)
+          values(id, num, tip, rent, dia, sta, vigi, vigf, depto,inqui);
+        END IF; 
+      END IF;
+  END;
+END inserta_contratos;
+
+CREATE OR REPLACE PROCEDURE DEPTOS.elimina_contratos(id number) IS
+BEGIN
+   DELETE FROM T_CONTRATOS te WHERE TE.ID_CONTRA=ID;
+END;
+
+CREATE OR REPLACE PROCEDURE DEPTOS.actualiza_contratos(
+  id IN NUMBER,
+  num in varchar2,
+  tip IN varchar2,
+  ren IN NUMBER,
+  dp IN VARCHAR2,
+  sta IN VARCHAR2,
+   VI IN DATE ,
+   VF IN DATE ,
+   IDD IN NUMBER ,
+   IDI IN NUMBER 
+) IS
+BEGIN
+  UPDATE T_CONTRATOS TE
+  SET TE.NUMERO=num
+  , te.TIPOP=tip
+  , te.RENTA=ren
+  , te.DIAP=dp
+  , te.ESTATUS=sta
+  , te.VIGENCIAI =VI
+  , te.VIGENCIAF = VF
+  , te.ID_DEPTO = IDD
+  , te.ID_INQUI =IDI
+  WHERE TE.id_contra=id;
+  COMMIT;
+END;
+
+CREATE OR REPLACE FORCE VIEW "DEPTOS"."VISTA_CONTRATOS"  AS 
+  SELECT tc.ID_CONTRA, tc.NUMERO, tc.TIPOP, tc.RENTA, tc.DIAP,
+  tc.ESTATUS, tc.VIGENCIAI, tc.VIGENCIAF, tc.ID_DEPTO, tc.ID_INQUI,
+  ti.NOMBRE||', '||ti.APELLIDOS Nombre, 
+  td.NUMERO||', '||td.DEPTO Depto 
+  FROM T_CONTRATOS tc, T_INQUILINOS ti , T_DEPTOS td 
+  WHERE ti.ID_INQUI = tc.ID_INQUI 
+  AND td.ID_DEPTO = tc.ID_DEPTO;
