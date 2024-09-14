@@ -1,0 +1,3 @@
+CREATE USER deptos IDENTIFIED BY dep4rm3nt0s;
+
+GRANT DBA TO deptos;
