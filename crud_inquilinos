@@ -1,5 +1,18 @@
 -- inquilinos
 
+CREATE OR REPLACE FUNCTION DEPTOS.genera_id_inquilinos
+RETURN NUMBER 
+IS
+   id_i NUMBER;
+BEGIN
+  begin 
+    SELECT DECODE(max(t.ID_INQUI)+1,NULL,1,max(t.ID_INQUI)+1) into id_i
+    FROM t_inquilinos t;
+    EXCEPTION WHEN NO_DATA_FOUND THEN id_i:=0;
+  end;
+  return id_i;
+END;
+
 CREATE OR REPLACE FUNCTION DEPTOS.VALIDA_INQUILINOS (id NUMBER)
 RETURN NUMBER 
 IS
