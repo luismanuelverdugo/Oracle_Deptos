@@ -1,0 +1,46 @@
+-- inquilinos
+
+CREATE OR REPLACE PROCEDURE DEPTOS.inserta_inquilinos(
+  nom IN VARCHAR2,
+  ape IN VARCHAR2,
+  tel IN varchar2,
+  refe IN varchar2,
+  sta IN varchar2
+) IS
+  id number;
+BEGIN
+  select genera_id_inquilinos into id from dual;
+  INSERT INTO T_inquilinos(id_inqui, nombre, apellidos, 
+  telefono, referencia, status)
+  values(id, nom, ape, tel, refe, sta);
+END inserta_inquilinos;
+
+CREATE OR REPLACE PROCEDURE DEPTOS.elimina_inquilinos(id number) IS
+BEGIN
+   DELETE FROM T_INQUILINOS ti WHERE ti.id_inqui=ID;
+END;
+
+CREATE OR REPLACE PROCEDURE DEPTOS.actualiza_inquilinos(
+  id IN NUMBER, 
+  nom IN varchar2,
+  ape IN VARCHAR2,
+  tel IN VARCHAR2,
+  refe IN varchar2,
+  sta IN varchar2
+) IS
+BEGIN
+  UPDATE T_inquilinos TE
+  SET TE.nombre=nom
+  , te.apellidos=ape
+  , te.telefono=tel
+  , te.referencia=refe
+  , te.status=sta
+  WHERE TE.id_inqui=id;
+  COMMIT;
+END;
+
+CREATE OR REPLACE FORCE VIEW "DEPTOS"."VISTA_INQUILINOS" AS 
+  SELECT ti.ID_INQUI , ti.NOMBRE , ti.APELLIDOS , ti.TELEFONO,
+  ti.REFERENCIA , ti.STATUS
+  FROM T_INQUILINOS ti 
+  ORDER BY ti.APELLIDOS , ti.NOMBRE;
