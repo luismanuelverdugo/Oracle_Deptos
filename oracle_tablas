@@ -1,0 +1,92 @@
+-- tabla de la base de datos
+
+create table t_inquilinos(
+  id_inqui number(6) ,
+  nombre varchar(32),
+  apellidos varchar(32),
+  telefono varchar(20), 
+  referencia varchar(64),
+  status varchar(1),
+  PRIMARY KEY (id_inqui)
+);
+
+create table t_edificios(
+  id_edif number(6) ,
+  edificio varchar(32),
+  direccion varchar(64),
+  PRIMARY KEY (id_edif)
+);
+
+create table t_deptos(
+  id_depto number(6) ,
+  numero varchar(3),
+  depto varchar(16),
+  direccion varchar(32),
+  id_edif number(6) REFERENCES t_edificios(id_edif),
+  PRIMARY KEY (id_depto)
+);
+
+create table t_contratos(
+  id_contra number(6) ,
+  numero varchar(8),
+  tipop varchar(1),
+  renta numeric(13,2),
+  diap varchar(2),
+  estatus varchar(1),
+  vigenciai date,
+  vigenciaf date,
+  id_depto number(6) REFERENCES t_deptos(id_depto),
+  id_inqui number(6) REFERENCES t_inquilinos(id_inqui),
+  PRIMARY KEY (id_contra)
+);
+
+create table t_pago(
+  id_pago number(6) ,
+  monto numeric(13,2),
+  comision numeric(13,2),
+  fecha date,
+  referencia varchar(64),
+  id_contra number(6) REFERENCES t_contratos(id_contra),
+  PRIMARY KEY (id_pago)
+);
+  
+create table t_deptos_manto(
+  id_manto number(6) ,
+  fecha date,
+  manto numeric(13,2),
+  costo numeric(13,2),
+  id_depto number(6) REFERENCES t_deptos(id_depto),
+  PRIMARY KEY (id_manto)
+);
+
+create table t_edificios_manto(
+  id_manto number(6) ,
+  fecha date,
+  manto numeric(13,2),
+  costo numeric(13,2),
+  id_edif number(6) REFERENCES t_edificios(id_edif),
+  PRIMARY KEY (id_manto)
+);
+
+create table t_marcas(
+  id_marca number(6) ,
+  marca varchar(32),
+  PRIMARY KEY (id_marca)
+);
+
+create table t_enseres(
+  id_enser number(6) ,
+  enser varchar(32),
+  codigo varchar(4),
+  PRIMARY KEY (id_enser)
+);
+
+create table t_deptos_enseres(
+  id_depens number(6) ,
+  código varchar(16),
+  id_enser number(6) REFERENCES t_enseres(id_enser),
+  id_marca number(6) REFERENCES t_marcas(id_marca),
+  id_depto number(6) REFERENCES t_deptos(id_depto),
+  PRIMARY KEY (id_depens)
+);
+
